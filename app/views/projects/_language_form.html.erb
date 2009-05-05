@@ -1,0 +1,8 @@
+<fieldset class="language-allocation">
+  <%= link_to_function image_tag("trash.gif"), :class => "remove-language-link" %>
+  <%= text_field_tag "language_name[]", "", :class => "language-name" %>
+  <%= text_field_tag "lines_of_code[]", "", :class => "lines-of-code" %>
+  <span class="percentage"/>
+</fieldset>
+
+<span class="next-language-form"></span>

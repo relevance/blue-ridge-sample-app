@@ -1,0 +1,36 @@
+<style type="text/css" media="screen">
+  #add-another-language-link {
+    font-size: 75%;
+    margin-left: 25px;
+  }
+  
+  form {
+    max-width: 500px;
+    
+    padding: .8em; 
+    margin-bottom: 1em; 
+    border: 2px solid #ddd;
+    background: #FFF6BF; 
+    color: #514721; 
+    border-color: #FFD324;
+  }
+
+  #results {
+    font-family: helvetica;
+    font-size: 6em;
+    text-align: center;
+    margin-top: 50px;
+  }
+</style>
+
+<h1>Should I Rewrite It In Scala?</h1>
+
+<% form_for(@project) do |f| %>
+  <%= f.error_messages %>
+  <%= render :partial => "language_form" %>
+  <%= link_to_function "add language", :id => "add-another-language-link" %>
+<% end %>
+
+<p><%= button_to_function "Time to rewrite?", :id => "should-i-rewrite-button" %></p>
+
+<div id="results"/>
