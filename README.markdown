@@ -11,12 +11,16 @@ This sample application demonstrates:
 * mocking functions
 * running the Blue Ridge specs as part of your default Rake task
 
+To verify that all the tests pass, clone the repo and follow the instructions below, or simply check out the app's latest build on [RunCodeRun](http://runcoderun.com/relevance/blue-ridge-sample-app).
+
+
 Noteworthy Bits
 ---------------
 
 * public/javascripts/project.js: the JavaScript code used to power the app's client-side interactivity
 * test/javascript/project\_spec.js: the specs for the JavaScript code present in public/javascripts/project.js
 * test/javascript/spec\_helper.js: the helper code used by project\_spec.js and available to any other JavaScript specs you might define for the app
+
 
 Installing and Running
 ----------------------
