@@ -23,7 +23,7 @@ Installing and Running
 
 To install:
 
-    git clone git@github.com:relevance/scalaenvy.git
+    git clone git://github.com/relevance/blue-ridge-sample-app.git scalaenvy
     cd scalaenvy
     cp config/database.sample.yml config/database.yml
     rake db:migrate
