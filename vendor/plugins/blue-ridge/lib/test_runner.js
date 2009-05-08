@@ -31,8 +31,8 @@ var PLUGIN_PREFIX = RAILS_ROOT_PREFIX + "/vendor/plugins/blue-ridge/";
 load(PLUGIN_PREFIX + "lib/env.rhino.js");
 window.location = fixture;
 
-load(PLUGIN_PREFIX + "lib/jquery-1.2.6.js");
-// load(PLUGIN_PREFIX + "lib/jquery-1.3.2.js");
+// load(PLUGIN_PREFIX + "lib/jquery-1.2.6.js");
+load(PLUGIN_PREFIX + "lib/jquery-1.3.2.js");
 
 load(PLUGIN_PREFIX + "lib/jquery.fn.js");
 load(PLUGIN_PREFIX + "lib/jquery.print.js");

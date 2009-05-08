@@ -112,7 +112,18 @@ Note that you must do the following:
 * put jQuery into "no conflict" mode to give the `$` function back to Prototype
 * require the `prototype.js` file
 * chain any files that are dependent on `prototype.js` in the `onload` callback
-  
+
+More Examples
+-------------
+
+To see Blue Ridge in action inside a working Rails app, check out the [Blue Ridge sample application](http://github.com/relevance/blue-ridge-sample-app).  Among other things, this sample app includes examples of:
+
+* using nested `describe` functions
+* setting up per-spec HTML "fixtures"
+* stubbing functions
+* mocking functions
+* running the Blue Ridge specs as part of your default Rake task
+
 JavaScript API
 --------------
 
@@ -171,7 +182,7 @@ Smoke is a JavaScript mocking and stubbing toolkit that is somewhat similar to F
 
 TextMate Integration
 --------------------
-Run your specs directory from TextMate using the [Blue Ridge TextMate Bundle](http://github.com/karnowski/blue-ridge.tmbundle).  (It's a fork of the original [Screw.Unit TextMate Bundle](http://github.com/coreyti/screw-unit-tmbundle) but adapted for use with the Blue Ridge plugin.)
+Run your specs directory from TextMate using the [Blue Ridge TextMate Bundle](http://github.com/karnowski/blue-ridge-tmbundle).  (It's a fork of the original [Screw.Unit TextMate Bundle](http://github.com/coreyti/screw-unit-tmbundle) but adapted for use with the Blue Ridge plugin.)
 
     cd ~/Library/Application Support/TextMate/Bundles/
     git clone git://github.com/karnowski/blue-ridge-tmbundle.git Blue\ Ridge.tmbundle
@@ -185,22 +196,21 @@ Tips & Tricks
 * Avoid using `print` in your tests while debugging.  It works fine from the command line but causes lots of headaches in browser.  (Just imagine a print dialog opening ten or fifteen times and then Firefox crashing.  This is a mistake I've made too many times!  Trust me!)
 * We don't recommend testing jQuery or Prototype, especially event wiring.  (You don't test Rails, do you?)  Instead write a separate function, test it, and wire it to events using jQuery or Prototype.
 
-Caveats
-----------
-env.js and jQuery 1.3.x do not currently get along well (as of 2009-04-14), so Blue Ridge currently runs command line specs using jQuery 1.2.6.  This is currently in active development, and any help is very appreciated!
+Bugs & Patches
+--------------
+First, if you see any bugs or possible improvements, please use the project's [GitHub issue tracker](http://github.com/relevance/blue-ridge/issues) to let us know about them.
 
-Contributing
-------------
-Fork the [Relevance repo on GitHub](http://www.github.com/relevance/blue-ridge) and start hacking!  If you have patches, send us pull requests.  Also, [env.js](http://github.com/thatcher/env-js), [Smoke](http://github.com/andykent/smoke), and [Screw.Unit](http://github.com/nkallen/screw-unit) could use your love too!
+But even better, fork our [GitHub repo](http://www.github.com/relevance/blue-ridge) and start hacking!  If you have patches, send us pull requests.  Also, [env.js](http://github.com/thatcher/env-js), [Smoke](http://github.com/andykent/smoke), and [Screw.Unit](http://github.com/nkallen/screw-unit) could use your love too!
 
 Links
 -------------
 * [Blue Ridge JavaScript Testing Rails Plugin](http://github.com/relevance/blue-ridge)
+* [Blue Ridge Sample App](http://github.com/relevance/blue-ridge-sample-app)
 * [Justin Gehtland's "Fully Headless JSSpec" Blog Post](http://blog.thinkrelevance.com/2008/7/31/fully-headless-jsspec)
 * [Screw.Unit](http://github.com/nkallen/screw-unit)
 * [Screw.Unit Mailing List](http://groups.google.com/group/screw-unit)
 * [Smoke](http://github.com/andykent/smoke)
-* [env.js](http://www.envjs.com) ([Github](http://github.com/thatcher/env-js))
+* [env.js](http://github.com/thatcher/env-js)
 * [env.js Mailing List](http://groups.google.com/group/envjs)
 * [Mozilla Rhino](http://www.mozilla.org/rhino/)
 * [W3C DOM Specifications](http://www.w3.org/DOM/DOMTR)

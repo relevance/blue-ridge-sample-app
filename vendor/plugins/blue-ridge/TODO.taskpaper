@@ -11,9 +11,9 @@ Release 1:
 - rake task to open fixtures in your favorite web browser? @done
 - make the generator check for "test", "spec", and then "examples" directory to create the "javascript" dir @done(2009-04-11)
 - support Prototype @done
-- support jQuery 1.3.x @env.js
+- support jQuery 1.3.x @env.js @done(2009-05-08)
 	- in browser @done(2009-04-11)
-	- from command line @in-progress
+	- from command line  @done(2009-05-08)
 - when clicking on a describe or it block in browser, run focused tests (thanks rsim!) @done(2009-04-11)
 - fix timing issues of "require" calls in browser tests often causing first test to fail @done(2009-04-11)
 - include Smoke for mocking @done(2009-04-11)
