@@ -25,26 +25,25 @@ var spec_file = arguments[0];
 var fixture = "fixtures/" + spec_file.replace(/^(.*?)_spec\.js$/, "$1.html");
 print("Running " + spec_file + " with fixture '" + fixture + "'...");
 
-var RAILS_ROOT_PREFIX = "../../";
-var PLUGIN_PREFIX = RAILS_ROOT_PREFIX + "/vendor/plugins/blue-ridge/";
+var PLUGIN_PREFIX = environment["blue.ridge.prefix"] || "../../vendor/plugins/blue-ridge";
 
-load(PLUGIN_PREFIX + "lib/env.rhino.js");
+load(PLUGIN_PREFIX + "/lib/env.rhino.js");
 window.location = fixture;
 
-// load(PLUGIN_PREFIX + "lib/jquery-1.2.6.js");
-load(PLUGIN_PREFIX + "lib/jquery-1.3.2.js");
+// load(PLUGIN_PREFIX + "/lib/jquery-1.2.6.js");
+load(PLUGIN_PREFIX + "/lib/jquery-1.3.2.js");
 
-load(PLUGIN_PREFIX + "lib/jquery.fn.js");
-load(PLUGIN_PREFIX + "lib/jquery.print.js");
-load(PLUGIN_PREFIX + "lib/screw.builder.js");
-load(PLUGIN_PREFIX + "lib/screw.matchers.js");
-load(PLUGIN_PREFIX + "lib/screw.events.js");
-load(PLUGIN_PREFIX + "lib/screw.behaviors.js");
-load(PLUGIN_PREFIX + "lib/smoke.core.js");
-load(PLUGIN_PREFIX + "lib/smoke.mock.js");
-load(PLUGIN_PREFIX + "lib/smoke.stub.js");
-load(PLUGIN_PREFIX + "lib/screw.mocking.js");
-load(PLUGIN_PREFIX + "lib/consoleReportForRake.js");
+load(PLUGIN_PREFIX + "/lib/jquery.fn.js");
+load(PLUGIN_PREFIX + "/lib/jquery.print.js");
+load(PLUGIN_PREFIX + "/lib/screw.builder.js");
+load(PLUGIN_PREFIX + "/lib/screw.matchers.js");
+load(PLUGIN_PREFIX + "/lib/screw.events.js");
+load(PLUGIN_PREFIX + "/lib/screw.behaviors.js");
+load(PLUGIN_PREFIX + "/lib/smoke.core.js");
+load(PLUGIN_PREFIX + "/lib/smoke.mock.js");
+load(PLUGIN_PREFIX + "/lib/smoke.stub.js");
+load(PLUGIN_PREFIX + "/lib/screw.mocking.js");
+load(PLUGIN_PREFIX + "/lib/consoleReportForRake.js");
 
 load(spec_file);
 jQuery(window).trigger("load");

@@ -1,5 +1,5 @@
-plugin_prefix = "#{RAILS_ROOT}/vendor/plugins/blue-ridge"
-rhino_command = "java -jar #{plugin_prefix}/lib/js.jar -w -debug"
+plugin_prefix = ENV["BLUE_RIDGE_PREFIX"] || "#{RAILS_ROOT}/vendor/plugins/blue-ridge"
+rhino_command = "java -Dblue.ridge.prefix=\"#{plugin_prefix}\" -jar #{plugin_prefix}/lib/js.jar -w -debug"
 test_runner_command = "#{rhino_command} #{plugin_prefix}/lib/test_runner.js"
 
 def find_base_dir

@@ -26,18 +26,20 @@ function derive_spec_name_from_current_file() {
   return file_prefix + "_spec.js";
 }
 
-// require("../../vendor/plugins/blue-ridge/lib/jquery-1.2.6.js");
-require("../../vendor/plugins/blue-ridge/lib/jquery-1.3.2.js");
+var BLUE_RIDGE_LIB_PREFIX = BLUE_RIDGE_LIB_PREFIX || "../../vendor/plugins/blue-ridge/lib/";
 
-require("../../vendor/plugins/blue-ridge/lib/jquery.fn.js");
-require("../../vendor/plugins/blue-ridge/lib/jquery.print.js");
-require("../../vendor/plugins/blue-ridge/lib/screw.builder.js");
-require("../../vendor/plugins/blue-ridge/lib/screw.matchers.js");
-require("../../vendor/plugins/blue-ridge/lib/screw.events.js");
-require("../../vendor/plugins/blue-ridge/lib/screw.behaviors.js");
-require("../../vendor/plugins/blue-ridge/lib/smoke.core.js");
-require("../../vendor/plugins/blue-ridge/lib/smoke.mock.js");
-require("../../vendor/plugins/blue-ridge/lib/smoke.stub.js");
-require("../../vendor/plugins/blue-ridge/lib/screw.mocking.js");
+// require(BLUE_RIDGE_LIB_PREFIX + "jquery-1.2.6.js");
+require(BLUE_RIDGE_LIB_PREFIX + "jquery-1.3.2.js");
+
+require(BLUE_RIDGE_LIB_PREFIX + "jquery.fn.js");
+require(BLUE_RIDGE_LIB_PREFIX + "jquery.print.js");
+require(BLUE_RIDGE_LIB_PREFIX + "screw.builder.js");
+require(BLUE_RIDGE_LIB_PREFIX + "screw.matchers.js");
+require(BLUE_RIDGE_LIB_PREFIX + "screw.events.js");
+require(BLUE_RIDGE_LIB_PREFIX + "screw.behaviors.js");
+require(BLUE_RIDGE_LIB_PREFIX + "smoke.core.js");
+require(BLUE_RIDGE_LIB_PREFIX + "smoke.mock.js");
+require(BLUE_RIDGE_LIB_PREFIX + "smoke.stub.js");
+require(BLUE_RIDGE_LIB_PREFIX + "screw.mocking.js");
 
 require(derive_spec_name_from_current_file());
