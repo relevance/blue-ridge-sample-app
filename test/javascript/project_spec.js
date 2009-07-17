@@ -90,6 +90,7 @@ Screw.Unit(function() {
         expect(Project.calculateRewriteTextForForm("#project")).to(equal, "No");
       });
     });
+
   });
 
 });
