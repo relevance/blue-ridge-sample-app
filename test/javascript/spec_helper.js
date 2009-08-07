@@ -4,7 +4,7 @@ function fixture(element) {
   $('<div id="fixtures"/>').append(element).appendTo("body");
 }
 
-function cleanFixtures() {
+function teardownFixtures() {
   $("#fixtures").remove();
 }
 
