@@ -1,9 +1,9 @@
-require("../spec_helper.js");
-require("../../../public/javascripts/project.js");
+require("../../spec_helper.js");
+require("../../../../public/javascripts/project.js");
 
 Screw.Unit(function() {
 
-  describe("Nested Project", function() {
+  describe("Doubly-Nested Project", function() {
     after(function(){ teardownFixtures() });
     
     describe("getLinesOfCodeForForm", function(){
