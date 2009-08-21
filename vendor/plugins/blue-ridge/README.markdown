@@ -8,6 +8,8 @@ The Blue Ridge JavaScript Testing Rails Plugin adds support for command-line and
 * `Smoke` - a JavaScript mocking & stubbing library similar to Mocha
 * `env.js` - a DOM implementation written entirely in JavaScript
 
+Please join our [mailing list](http://groups.google.com/group/blueridgejs) if you're interested in Blue Ridge!
+
 Installing and Running
 ----------------------
 
@@ -206,6 +208,7 @@ Links
 -------------
 * [Blue Ridge JavaScript Testing Rails Plugin](http://github.com/relevance/blue-ridge)
 * [Blue Ridge Sample App](http://github.com/relevance/blue-ridge-sample-app)
+* [Mailing List](http://groups.google.com/group/blueridgejs)
 * [Justin Gehtland's "Fully Headless JSSpec" Blog Post](http://blog.thinkrelevance.com/2008/7/31/fully-headless-jsspec)
 * [Screw.Unit](http://github.com/nkallen/screw-unit)
 * [Screw.Unit Mailing List](http://groups.google.com/group/screw-unit)

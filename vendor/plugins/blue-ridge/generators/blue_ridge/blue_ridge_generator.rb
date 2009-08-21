@@ -1,6 +1,10 @@
+require File.expand_path(File.dirname(__FILE__) + '/../../lib/blue_ridge')
+
 class BlueRidgeGenerator < Rails::Generator::Base
   def manifest
     record do |m|
+      base_dir = BlueRidge.javascript_spec_dir
+      
       m.directory base_dir
       m.file 'application_spec.js', "#{base_dir}/application_spec.js"
       m.file 'spec_helper.js',      "#{base_dir}/spec_helper.js"
@@ -10,9 +14,4 @@ class BlueRidgeGenerator < Rails::Generator::Base
       m.file 'screw.css',        "#{base_dir}/fixtures/screw.css"
     end
   end
-
-  def base_dir
-    @base_dir ||= File.exist?("examples") ? "examples/javascripts" : File.exist?("spec") ? "spec/javascripts" : "test/javascript"
-  end
-
 end

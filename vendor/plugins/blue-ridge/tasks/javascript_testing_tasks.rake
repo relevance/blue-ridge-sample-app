@@ -1,29 +1,18 @@
-plugin_prefix = ENV["BLUE_RIDGE_PREFIX"] || "#{RAILS_ROOT}/vendor/plugins/blue-ridge"
-rhino_command = "java -Dblue.ridge.prefix=\"#{plugin_prefix}\" -jar #{plugin_prefix}/lib/js.jar -w -debug"
-test_runner_command = "#{rhino_command} #{plugin_prefix}/lib/test_runner.js"
+require File.expand_path(File.dirname(__FILE__) + '/../lib/blue_ridge')
 
-def find_base_dir
-  target_dirs = ["test/javascript", "spec/javascripts", "examples/javascripts"]
-  base_dir = target_dirs.find {|d| File.exist?(d) }
-  raise "Could not find JavaScript test directory.\nNone of the following directories existed: #{target_dirs.join(", ")}.\nMaybe you need to call './script/generate blue_ridge'?" unless base_dir
-  base_dir
+def error_message_for_missing_spec_dir 
+  %Q{Could not find JavaScript test directory.
+None of the following directories existed: #{BlueRidge::JavaScriptSpecDirs.join(", ")}.
+Maybe you need to call './script/generate blue_ridge'?
+}
 end
 
 # Support Test::Unit & Test/Spec style
 namespace :test do
   desc "Runs all the JavaScript tests and outputs the results"
   task :javascripts do
-    Dir.chdir(find_base_dir) do
-      all_fine = true
-      if ENV["TEST"]
-        all_fine = false unless system("#{test_runner_command} #{ENV["TEST"]}_spec.js")
-      else
-        Dir.glob("**/*_spec.js").each do |file|
-          all_fine = false unless system("#{test_runner_command} #{file}")
-        end
-      end
-      raise "JavaScript test failures" unless all_fine
-    end
+    js_spec_dir = BlueRidge.find_javascript_spec_dir || (raise error_message_for_missing_spec_dir)
+    raise "JavaScript test failures" unless BlueRidge.run_specs_in_dir(js_spec_dir, ENV["TEST"])
   end
   
   task :javascript => :javascripts
@@ -31,20 +20,21 @@ end
 
 # Support RSpec style
 namespace :spec do
-  task :javascripts => ["test:javascripts"]
-  task :javascript =>  ["test:javascripts"]
+  task :javascripts => "test:javascripts"
+  task :javascript =>  "test:javascripts"
 end
 
 # Support Micronaut style
 namespace :examples do
-  task :javascripts => ["test:javascripts"]
-  task :javascript =>  ["test:javascripts"]
+  task :javascripts => "test:javascripts"
+  task :javascript =>  "test:javascripts"
 end
 
 
 namespace :js do
   task :fixtures do
-    fixture_dir = "#{RAILS_ROOT}/#{find_base_dir}/fixtures"
+    js_spec_dir = BlueRidge.find_javascript_spec_dir || (raise error_message_for_missing_spec_dir)
+    fixture_dir = "#{js_spec_dir}/fixtures"
     
     if PLATFORM[/darwin/]
       system("open #{fixture_dir}")
@@ -57,6 +47,6 @@ namespace :js do
   
   task :shell do
     rlwrap = `which rlwrap`.chomp
-    system("#{rlwrap} #{rhino_command} -f #{plugin_prefix}/lib/shell.js -f -")
+    system("#{rlwrap} #{BlueRidge.rhino_command} -f #{BlueRidge.plugin_prefix}/lib/shell.js -f -")
   end
 end

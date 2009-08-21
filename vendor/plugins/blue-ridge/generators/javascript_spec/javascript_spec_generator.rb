@@ -3,6 +3,8 @@ class JavascriptSpecGenerator < Rails::Generator::NamedBase
     file_path_with_spec, file_path_without_spec = file_path_with_and_without_spec
     
     record do |m|
+      base_dir = BlueRidge.javascript_spec_dir
+      
       m.directory base_dir
       m.directory "#{base_dir}/fixtures"
       
@@ -10,10 +12,6 @@ class JavascriptSpecGenerator < Rails::Generator::NamedBase
       m.template 'javascript_spec.js.erb', "#{base_dir}/#{file_path_with_spec}.js", :assigns => options
       m.template 'fixture.html.erb', "#{base_dir}/fixtures/#{file_path_without_spec}.html", :assigns => options
     end
-  end
-
-  def base_dir
-    @base_dir ||= File.exist?("spec") ? "spec/javascripts" : "test/javascript"
   end
 
   def file_path_with_and_without_spec

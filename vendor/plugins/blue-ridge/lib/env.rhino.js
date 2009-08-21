@@ -293,8 +293,8 @@ var __policy__ = {};
     
     //you can change these to $env.safeScript to avoid loading scripts
     //or change to $env.loadLocalScripts to load local scripts
-    //$policy.loadScript    = $env.safeScript;
-    $policy.loadScript    = $env.loadLocalScript;
+    $policy.loadScript    = $env.safeScript;
+    // $policy.loadScript    = $env.loadLocalScript;
     
 })(__policy__, __env__);/*
  * Pure JavaScript Browser Environment
