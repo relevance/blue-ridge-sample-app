@@ -52,7 +52,11 @@ if(BlueRidge.loaded != true) {
 
   var BLUE_RIDGE_LIB_PREFIX = (environment["blue.ridge.prefix"] || "../../vendor/plugins/blue-ridge") + "/lib/";
   require(BLUE_RIDGE_LIB_PREFIX + "env.rhino.js");
-  window.location = BlueRidge.CommandLine.fixtureFile;
+
+  Envjs(BlueRidge.CommandLine.fixtureFile, {
+    loadInlineScript: function(){},
+    log: function(){}
+  });
 
   require(BLUE_RIDGE_LIB_PREFIX + "jquery-1.3.2.js");
   require(BLUE_RIDGE_LIB_PREFIX + "jquery.fn.js");

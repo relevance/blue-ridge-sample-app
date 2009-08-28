@@ -81,7 +81,7 @@ Screw.Unit(function() {
 
       describe('when the element is an img', function() {
         it('prints out the img src attribute', function() {
-          expect($.print($('<img src="test.png"/>'))).to(match, /<img src=".+?test.png">/);
+          expect($.print($('<img src="test.png"/>'))).to(match, /<img src=".*?test.png">/);
         })
       });
     });
