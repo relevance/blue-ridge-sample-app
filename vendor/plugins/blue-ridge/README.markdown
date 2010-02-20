@@ -219,15 +219,6 @@ Links
 * [Mozilla Rhino](http://www.mozilla.org/rhino/)
 * [W3C DOM Specifications](http://www.w3.org/DOM/DOMTR)
 
-Contributors
-------------
-* Justin Gehtland
-* Geof Dagley
-* Larry Karnowski
-* Chris Thatcher (for numerous env.js bug fixes!)
-* Raimonds Simanovskis
-* Jason Rudolph
-
 Copyrights
 ------------
 * Copyright &copy; 2008-2009 [Relevance, Inc.](http://www.thinkrelevance.com/), under the MIT license

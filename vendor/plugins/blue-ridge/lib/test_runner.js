@@ -33,6 +33,25 @@ BlueRidge.CommandLine = {
   get specBasename(){
     if(this.specFile == null) { return null; }
     return this.specFile.split("/").pop();
+  },
+  
+  exampleName: function(element){
+    var exampleName = jQuery.trim(jQuery(element).children("h2").text());
+    
+    var names = this.contextNamesForExample(element);
+    names.push(exampleName);
+    
+    return names.join(" ");
+  },
+  
+  contextNamesForExample: function(element){
+    var describes = jQuery(element).parents('.describe').children('h1');
+    
+    var contextNames = jQuery.map(describes, function(context){
+      return jQuery.trim(jQuery(context).text());
+    });
+    
+    return contextNames.reverse();
   }
 };
 
@@ -48,27 +67,30 @@ if(BlueRidge.loaded != true) {
   var debug   = function(message)     { return BlueRidge.CommandLine.debug(message) };
 
   // Mock up the Firebug API for convenience.
-  var console = console || {debug: debug};
+  var console = console || {debug: debug, log: debug, info: debug, warn: debug, error: debug};
 
-  var BLUE_RIDGE_LIB_PREFIX = (environment["blue.ridge.prefix"] || "../../vendor/plugins/blue-ridge") + "/lib/";
-  require(BLUE_RIDGE_LIB_PREFIX + "env.rhino.js");
+  var BLUE_RIDGE_PREFIX = (environment["blue.ridge.prefix"] || "../../vendor/plugins/blue-ridge");
+  var BLUE_RIDGE_LIB_PREFIX    = BLUE_RIDGE_PREFIX + "/lib/";
+  var BLUE_RIDGE_VENDOR_PREFIX = BLUE_RIDGE_PREFIX + "/vendor/";
+
+  require(BLUE_RIDGE_VENDOR_PREFIX + "env.rhino.js");
 
   Envjs(BlueRidge.CommandLine.fixtureFile, {
     loadInlineScript: function(){},
     log: function(){}
   });
 
-  require(BLUE_RIDGE_LIB_PREFIX + "jquery-1.3.2.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "jquery.fn.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "jquery.print.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "screw.builder.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "screw.matchers.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "screw.events.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "screw.behaviors.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "smoke.core.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "smoke.mock.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "smoke.stub.js");
-  require(BLUE_RIDGE_LIB_PREFIX + "screw.mocking.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "jquery-1.3.2.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "jquery.fn.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "jquery.print.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "screw.builder.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "screw.matchers.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "screw.events.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "screw.behaviors.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "smoke.core.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "smoke.mock.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "smoke.stub.js");
+  require(BLUE_RIDGE_VENDOR_PREFIX + "screw.mocking.js");
   require(BLUE_RIDGE_LIB_PREFIX + "consoleReportForRake.js");
 
   print("Running " + BlueRidge.CommandLine.specFile + " with fixture '" + BlueRidge.CommandLine.fixtureFile + "'...");

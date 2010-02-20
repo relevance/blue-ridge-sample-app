@@ -6,7 +6,7 @@ module BlueRidge
   end
   
   def self.rhino_command
-    "java -Dblue.ridge.prefix=\"#{plugin_prefix}\" -jar #{plugin_prefix}/lib/env-js.jar -w -debug"
+    "java -Dblue.ridge.prefix=\"#{plugin_prefix}\" -jar #{plugin_prefix}/vendor/env-js.jar -w -debug"
   end
   
   def self.test_runner_command

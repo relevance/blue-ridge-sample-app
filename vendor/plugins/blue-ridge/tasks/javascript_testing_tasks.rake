@@ -9,7 +9,7 @@ end
 
 # Support Test::Unit & Test/Spec style
 namespace :test do
-  desc "Runs all the JavaScript tests and outputs the results"
+  desc "Runs all the JavaScript tests and outputs the results."
   task :javascripts do
     js_spec_dir = BlueRidge.find_javascript_spec_dir || (raise error_message_for_missing_spec_dir)
     raise "JavaScript test failures" unless BlueRidge.run_specs_in_dir(js_spec_dir, ENV["TEST"])
@@ -32,6 +32,7 @@ end
 
 
 namespace :js do
+  desc "Open the JavaScript fixtures to ease running in-browser tests."
   task :fixtures do
     js_spec_dir = BlueRidge.find_javascript_spec_dir || (raise error_message_for_missing_spec_dir)
     fixture_dir = "#{js_spec_dir}/fixtures"
@@ -45,6 +46,7 @@ namespace :js do
     end
   end
   
+  desc "Runs the Rhino JavaScript shell."
   task :shell do
     rlwrap = `which rlwrap`.chomp
     system("#{rlwrap} #{BlueRidge.rhino_command} -f #{BlueRidge.plugin_prefix}/lib/shell.js -f -")

@@ -1,5 +1,5 @@
 /*
- * Envjs env-js.1.0.rc5 
+ * Envjs env-js.1.0.rc7 
  * Pure JavaScript Browser Environment
  *   By John Resig <http://ejohn.org/>
  * Copyright 2008-2009 John Resig, under the MIT License
@@ -36,33 +36,60 @@ var Envjs = function(){
     $env.profile = false;
     
     $env.log = function(msg, level){};
-    $env.debug  = function(){};
-    $env.info   = function(){};
-    $env.warn   = function(){};
-    $env.error  = function(){};
+	
+    $env.DEBUG  = 4;
+    $env.INFO   = 3;
+    $env.WARN   = 2;
+    $env.ERROR  = 1;
+	$env.NONE   = 0;
+	
+    //set this if you want to get some internal log statements
+    $env.logLevel = $env.INFO;
     
-    
-    $env.debugParser = false;
-    //uncomment these if you want to get some internal log statementes
-    /*$env.debug  = function(msg){
-        $env.log(msg,"DEBUG"); 
-    };*/
-    $env.info   = function(msg){
-        $env.log(msg,"INFO"); 
+    $env.debug  = function(msg){
+		if($env.logLevel >= $env.DEBUG)
+            $env.log(msg,"DEBUG"); 
+    };
+    $env.info = function(msg){
+        if($env.logLevel >= $env.INFO)
+            $env.log(msg,"INFO"); 
     };
     $env.warn   = function(msg){
-        $env.log(msg,"WARNIING");    
+        if($env.logLevel >= $env.WARN)
+            $env.log(msg,"WARNIING");    
     };
     $env.error = function(msg, e){
-        $env.log(msg+ " Line: "+ $env.lineSource(e),'ERROR');
-        $env.log(e||"",'ERROR');
+        if ($env.logLevel >= $env.ERROR) {
+			$env.log(msg + " Line: " + $env.lineSource(e), 'ERROR');
+			$env.log(e || "", 'ERROR');
+		}
     };
     
     $env.info("Initializing Core Platform Env");
-    
+
+
+    // if we're running in an environment without env.js' custom extensions
+    // for manipulating the JavaScript scope chain, put in trivial emulations
+    $env.debug("performing check for custom Java methods in env-js.jar");
+    var countOfMissing = 0, dontCare;
+    try { dontCare = globalize; }
+    catch (ex){      globalize         = function(){ return {}; };
+                                                       countOfMissing++; }
+    try { dontCare = getScope; }
+    catch (ex){      getScope          = function(){}; countOfMissing++; }
+    try { dontCare = setScope; }
+    catch (ex){      setScope          = function(){}; countOfMissing++; }
+    try { dontCare = configureScope; }
+    catch (ex){      configureScope    = function(){}; countOfMissing++; }
+    try { dontCare = restoreScope; }
+    catch (ex){      restoreScope      = function(){}; countOfMissing++; }
+    if (countOfMissing != 0 && countOfMissing != 5)
+        $env.warning("Some but not all of scope-manipulation functions were " +
+                     "not present in environment.  JavaScript execution may " +
+                     "not occur correctly.");
+
+
     $env.lineSource = function(e){};
-    
-    $env.hashCode = function(obj){};
     
     //resolves location relative to base or window location
     $env.location = function(path, base){};
@@ -70,7 +97,6 @@ var Envjs = function(){
     //For Java the window.timer is created using the java.lang.Thread in combination
     //with the java.lang.Runnable
     $env.timer = function(fn, time){};	
-    $env.wait = function(wait){};
     
     $env.javaEnabled = false;	
     
@@ -102,10 +128,6 @@ var Envjs = function(){
     
     $env.load = function(){};
     
-    $env.safeScript = function(){
-      //do nothing  
-    };
-    
     $env.scriptTypes = {
         "text/javascript"   :false,
         "text/envjs"        :true
@@ -132,10 +154,10 @@ var Envjs = function(){
                             $env.info("loading allowed external script :" + script.src);
                             //lets you register a function to execute 
                             //before the script is loaded
-                            if($env.beforeload){
-                                for(src in $env.beforeload){
+                            if($env.beforeScriptLoad){
+                                for(src in $env.beforeScriptLoad){
                                     if(script.src.match(src)){
-                                        $env.beforeload[src]();
+                                        $env.beforeScriptLoad[src]();
                                     }
                                 }
                             }
@@ -143,10 +165,10 @@ var Envjs = function(){
 							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
                             //lets you register a function to execute 
                             //after the script is loaded
-                            if($env.afterload){
-                                for(src in $env.afterload){
+                            if($env.afterScriptLoad){
+                                for(src in $env.afterScriptLoad){
                                     if(script.src.match(src)){
-                                        $env.afterload[src]();
+                                        $env.afterScriptLoad[src]();
                                     }
                                 }
                             }
@@ -190,7 +212,7 @@ var Envjs = function(){
         try {
 
             var frameWindow,
-            	makingNewWinFlag = !(frame._content);
+                makingNewWinFlag = !(frame._content);
             if (makingNewWinFlag)
                 // a blank object, inherits from original global
                 // see org.mozilla.javascript.tools.envjs.Window.java
@@ -204,7 +226,7 @@ var Envjs = function(){
             // function executes we'll have a new/blank
             // global/window and won't be able to get at them....
             var local__window__    = $env.window,
-            	local_env          = $env,
+                local_env          = $env,
                 local_window       = frame.ownerDocument.parentWindow;
 
             // a local function gives us something whose scope
@@ -245,7 +267,6 @@ var Envjs = function(){
             $env.setScope(local__window__, scopes.window);
             $env.setScope($env.load, scopes.global_load);
             $env.setScope($env.loadLocalScript, scopes.local_load);
-            
         } catch(e){
             $env.error("failed to load frame content: from " + url, e);
         }
@@ -263,10 +284,6 @@ var Envjs = function(){
     
     $env.lineSource = function(e){
         return e&&e.rhinoException?e.rhinoException.lineSource():"(line ?)";
-    };
-    
-    $env.hashCode = function(obj){
-        return obj?obj.hashCode().toString()+'':null;
     };
     
     //For Java the window.location object is a java.net.URL
@@ -484,7 +501,12 @@ var Envjs = function(){
                         new java.util.zip.GZIPInputStream(connection.getInputStream()) :
                         connection.getInputStream();
             }catch(e){
-                $env.error('failed to open connection stream \n'+e.toString(), e);
+                if (connection.getResponseCode() == 404)
+                    $env.info('failed to open connection stream \n' +
+                              e.toString(), e);
+                else
+                    $env.error('failed to open connection stream \n' +
+                               e.toString(), e);
                 stream = connection.getErrorStream();
             }
             
@@ -509,46 +531,36 @@ var Envjs = function(){
     htmlDocBuilder.setNamespaceAware(false);
     htmlDocBuilder.setValidating(false);
     
-    var htmlCleaner,
-        cleanXMLSerializer,
-        cleanerProperties,
-        htmlTransformer,
-        htmlOutputProps;
-    $env.fixHTML = false;
-    $env.cleanHTML = function(xmlString){
-        var htmlString;
-        $env.debug('Cleaning html :\n'+xmlString);
-        if(!htmlCleaner){
-            cleanerProperties = new org.htmlcleaner.CleanerProperties();
-            cleanerProperties.setOmitHtmlEnvelope(true);
-            cleanerProperties.setTranslateSpecialEntities(true);
-            cleanerProperties.setAdvancedXmlEscape(true);
-            cleanerProperties.setUseCdataForScriptAndStyle(false);
-            cleanerProperties.setOmitXmlDeclaration(true);
-            htmlCleaner = new org.htmlcleaner.HtmlCleaner(cleanerProperties);
-            cleanXMLSerializer = new org.htmlcleaner.SimpleXmlSerializer(cleanerProperties);
-            //may have been initialized in $env.xslt
-            /*transformerFactory = transformerFactory||
-                Packages.javax.xml.transform.TransformerFactory.newInstance();
-            htmlTransformer = transformerFactory.newTransformer();
-            htmlOutputProps = new java.util.Properties();
-            htmlOutputProps.put(javax.xml.transform.OutputKeys.METHOD, "xml");
-            htmlOutputProps.put(javax.xml.transform.OutputKeys.INDENT , "no");
-            htmlOutputProps.put(javax.xml.transform.OutputKeys.ENCODING  , "UTF-8");
-            htmlOutputProps.put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION  , "yes");
-            htmlTransformer.setOutputProperties(htmlOutputProps)*/
+    var tidy;
+    $env.tidyHTML = false;
+    $env.tidy = function(htmlString){
+        $env.debug('Cleaning html :\n'+htmlString);
+        var xmlString,
+		    baos = new java.io.ByteArrayOutputStream(),
+		    bais = new java.io.ByteArrayInputStream(
+			           (new java.lang.String(htmlString)).
+					        getBytes("UTF8"));
+		try{
+	        if(!tidy){
+	            tidy = new org.w3c.tidy.Tidy();
+	        }
+            $env.debug('tidying');
+	        tidy.parse(bais,baos);
+			xmlString = java.nio.charset.Charset.forName("UTF-8").
+                decode(java.nio.ByteBuffer.wrap(baos.toByteArray())).toString()+"";
+            $env.debug('finished tidying');
+		}catch(e){
+            $env.error('error in html tidy', e);
+        }finally{
+            try{
+                bais.close();
+                baos.close();
+            }catch(ee){
+                //swallow
+            }
         }
-        
-        /*var node = cleanXMLSerializer.createDOM(htmlCleaner.clean(xmlString)),
-            outText = new java.io.StringWriter();
-        htmlTransformer.transform(
-            new javax.xml.transform.dom.DOMSource(node),
-            new javax.xml.transform.stream.StreamResult(outText));
-            
-        htmlString = outText.toString()+'';*/
-        htmlString = cleanXMLSerializer.getXmlAsString(htmlCleaner.clean(xmlString));
-        //$env.info('Cleaned html :\n'+htmlString);
-        return htmlString;
+        $env.debug('Cleaned html :\n'+xmlString);
+        return xmlString;
     };
     
     var xmlDocBuilder = Packages.javax.xml.parsers.DocumentBuilderFactory.newInstance();
@@ -571,7 +583,7 @@ var Envjs = function(){
     var jsonmlxslt;
     $env.jsonml = function(xmlstring){
         jsonmlxslt = jsonmlxslt||$env.xslt($env.xml2jsonml.toXMLString());
-        var jsonml = $env.xslttransform(jsonmlxslt, xmlstring);
+        var jsonml = $env.transform(jsonmlxslt, xmlstring);
         //$env.debug('jsonml :\n'+jsonml);
         return eval(jsonml);
     };
@@ -585,7 +597,7 @@ var Envjs = function(){
               )
           );
     };
-    $env.xslttransform = function(xslt, xmlstring){
+    $env.transform = function(xslt, xmlstring){
         var baos = new java.io.ByteArrayOutputStream();
         xslt.transform(
             new javax.xml.transform.dom.DOMSource($env.parseHTML(xmlstring)),
@@ -605,10 +617,6 @@ var Envjs = function(){
     //injected by org.mozilla.javascript.tools.envjs.
     $env.load = load;
 
-    $env.safeScript = function(){
-      //do nothing  
-    };
-    
     $env.scriptTypes = {
         "text/javascript"   :false,
         "text/envjs"        :true
@@ -629,7 +637,7 @@ var Envjs = function(){
     $env.restoreScope = restoreScope;
     
 })(Envjs);/*
- * Envjs env-js.1.0.rc5 
+ * Envjs env-js.1.0.rc7 
  * Pure JavaScript Browser Environment
  *   By John Resig <http://ejohn.org/>
  * Copyright 2008-2009 John Resig, under the MIT License
@@ -2851,10 +2859,16 @@ XMLP.prototype._addAttribute = function(name, value) {
 
 XMLP.prototype._checkStructure = function(iEvent) {
 
-        if(XMLP._STATE_PROLOG == this.m_iState) {
-                if((XMLP._TEXT == iEvent) || (XMLP._ENTITY == iEvent)) {
-            if(SAXStrings.indexOfNonWhitespace(this.getContent(), this.getContentBegin(), this.getContentEnd()) != -1) {
-                                return this._setErr(XMLP.ERR_DOC_STRUCTURE);
+    if(XMLP._STATE_PROLOG == this.m_iState) {
+
+	    //The prolog is initial state of the document before parsing
+	    //has really begun.  A rigid xml parsing implementation would not
+		//allow anything but '<' as the first non-whitespace character
+        if((XMLP._TEXT == iEvent) || (XMLP._ENTITY == iEvent)) {
+            if(SAXStrings.indexOfNonWhitespace(this.getContent(), 
+			    this.getContentBegin(), this.getContentEnd()) != -1) {
+                    //TODO: HTML Helper here.
+                    return this._setErr(XMLP.ERR_DOC_STRUCTURE);
             }
         }
 
@@ -2862,8 +2876,14 @@ XMLP.prototype._checkStructure = function(iEvent) {
             this.m_iState = XMLP._STATE_DOCUMENT;
             // Don't return - fall through to next state
         }
+		
     }
+	
+	
     if(XMLP._STATE_DOCUMENT == this.m_iState) {
+        //The document is the state that the parser is in after the
+		//first element event, and remains in that state until
+		//the initial element is closed
         if((XMLP._ELM_B == iEvent) || (XMLP._ELM_EMP == iEvent)) {
             this.m_stack.push(this.getName());
         }
@@ -2880,26 +2900,37 @@ XMLP.prototype._checkStructure = function(iEvent) {
             return iEvent;
         }
     }
+	
+	
     if(XMLP._STATE_MISC == this.m_iState) {
-                if((XMLP._ELM_B == iEvent) || (XMLP._ELM_E == iEvent) || (XMLP._ELM_EMP == iEvent) || (XMLP.EVT_DTD == iEvent)) {
-                        return this._setErr(XMLP.ERR_DOC_STRUCTURE);
+        //The misc parser state occurs after the root element has been
+		//closed.  basically a rigid xml parser would throw an error
+		//for any element or text found after this
+        if((XMLP._ELM_B == iEvent) || 
+		   (XMLP._ELM_E == iEvent) || 
+		   (XMLP._ELM_EMP == iEvent) || 
+		   (XMLP.EVT_DTD == iEvent)) {
+            //TODO: HTML Helper here.
+            return this._setErr(XMLP.ERR_DOC_STRUCTURE);
         }
 
         if((XMLP._TEXT == iEvent) || (XMLP._ENTITY == iEvent)) {
-                        if(SAXStrings.indexOfNonWhitespace(this.getContent(), this.getContentBegin(), this.getContentEnd()) != -1) {
-                                return this._setErr(XMLP.ERR_DOC_STRUCTURE);
+            if(SAXStrings.indexOfNonWhitespace(this.getContent(), 
+			     this.getContentBegin(), this.getContentEnd()) != -1) {
+                    //TODO: HTML Helper here.
+                    return this._setErr(XMLP.ERR_DOC_STRUCTURE);
             }
         }
     }
 
     return iEvent;
 
-}
+};
 
 
 XMLP.prototype._clearAttributes = function() {
     this.m_atts = new Array();
-}
+};
 
 
 XMLP.prototype._findAttributeIndex = function(name) {
@@ -2910,92 +2941,98 @@ XMLP.prototype._findAttributeIndex = function(name) {
     }
     return -1;
 
-}
+};
 
 
 XMLP.prototype.getAttributeCount = function() {
 
     return this.m_atts ? this.m_atts.length : 0;
 
-}
+};
 
 
 XMLP.prototype.getAttributeName = function(index) {
 
-    return ((index < 0) || (index >= this.m_atts.length)) ? null : this.m_atts[index][XMLP._ATT_NAME];
+    return ((index < 0) || (index >= this.m_atts.length)) ? 
+       null : 
+       this.m_atts[index][XMLP._ATT_NAME];
 
-}
+};
 
 
 XMLP.prototype.getAttributeValue = function(index) {
 
-    return ((index < 0) || (index >= this.m_atts.length)) ? null : __unescapeXML__(this.m_atts[index][XMLP._ATT_VAL]);
+    return ((index < 0) || (index >= this.m_atts.length)) ? 
+       null : 
+	   __unescapeXML__(this.m_atts[index][XMLP._ATT_VAL]);
 
-}
+};
 
 
 XMLP.prototype.getAttributeValueByName = function(name) {
 
     return this.getAttributeValue(this._findAttributeIndex(name));
 
-}
+};
 
 
 XMLP.prototype.getColumnNumber = function() {
 
     return SAXStrings.getColumnNumber(this.m_xml, this.m_iP);
 
-}
+};
 
 
 XMLP.prototype.getContent = function() {
 
-    return (this.m_cSrc == XMLP._CONT_XML) ? this.m_xml : this.m_cAlt;
+    return (this.m_cSrc == XMLP._CONT_XML) ? 
+	   this.m_xml : 
+	   this.m_cAlt;
 
-}
+};
 
 
 XMLP.prototype.getContentBegin = function() {
 
     return this.m_cB;
 
-}
+};
 
 
 XMLP.prototype.getContentEnd = function() {
 
     return this.m_cE;
 
-}
+};
 
 
 XMLP.prototype.getLineNumber = function() {
 
     return SAXStrings.getLineNumber(this.m_xml, this.m_iP);
 
-}
+};
 
 
 XMLP.prototype.getName = function() {
 
     return this.m_name;
 
-}
+};
 
 
 XMLP.prototype.next = function() {
 
     return this._checkStructure(this._parse());
 
-}
+};
 
 XMLP.prototype.appendFragment = function(xmlfragment) {
 
-        var start = this.m_xml.slice(0,this.m_iP);
-        var end = this.m_xml.slice(this.m_iP);
-        this.m_xml = start+xmlfragment+end;
+    var start = this.m_xml.slice(0,this.m_iP);
+    var end = this.m_xml.slice(this.m_iP);
+    this.m_xml = start+xmlfragment+end;
 
-}
+};
 
 
 XMLP.prototype._parse = function() {
@@ -3040,9 +3077,11 @@ XMLP.prototype._parseAttribute = function(iB, iE) {
     var iNB, iNE, iEq, iVB, iVE;
     var cQuote, strN, strV;
 
-        this.m_cAlt = ""; //resets the value so we don't use an old one by accident (see testAttribute7 in the test suite)
+    //resets the value so we don't use an old one by 
+	//accident (see testAttribute7 in the test suite)
+	this.m_cAlt = ""; 
 
-        iNB = SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iE);
+    iNB = SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iE);
     if((iNB == -1) ||(iNB >= iE)) {
         return iNB;
     }
@@ -4533,8 +4572,8 @@ function __parseLoop__(impl, doc, p, isWindowDocument) {
         iNodeParent._documentElement = iNode;        // register this Element as the Document.documentElement
       }
 
-      __endHTMLElement__(iNode, doc, p);
       iNodeParent.appendChild(iNode);               // attach Element to parentNode
+      __endHTMLElement__(iNode, doc, p);
     }
     else if(iEvt == XMLP._TEXT || iEvt == XMLP._ENTITY) {                   // TextNode and entity Events
       // get Text content
@@ -4828,8 +4867,8 @@ __extend__(DOMDocument.prototype, {
     loadXML : function(xmlString) {
         // create SAX Parser
         var htmlString;
-        if($env.fixHTML){
-            htmlString = $env.cleanHTML(xmlString);
+        if($env.tidyHTML){
+            htmlString = $env.tidy(xmlString);
         }else{
             htmlString = xmlString
         }
@@ -4894,6 +4933,11 @@ __extend__(DOMDocument.prototype, {
             event = document.createEvent();
             event.initEvent("load");
             $w.dispatchEvent( event, false );
+			
+			//also use DOMContentLoaded event
+            var domContentLoaded = document.createEvent();
+            domContentLoaded.initEvent("DOMContentLoaded");
+            $w.dispatchEvent( domContentLoaded, false );
         };
         xhr.send();
     },
@@ -5737,6 +5781,20 @@ var HTMLElement = function(ownerDocument) {
 };
 HTMLElement.prototype = new DOMElement;
 __extend__(HTMLElement.prototype, {
+    $recursivelyGatherTextFromNodeTree: function(aNode) {
+        var accumulateText = "";
+        var idx; var n;
+        for (idx=0;idx < aNode.childNodes.length;idx++){
+            n = aNode.childNodes.item(idx);
+        if      (n.nodeType == DOMNode.TEXT_NODE)
+                accumulateText += n.data;
+            else
+                accumulateText += this.$recursivelyGatherTextFromNodeTree(n);
+        }
+
+        return accumulateText;
+    },
+
 		get className() { 
 		    return this.getAttribute("class")||''; 
 	    },
@@ -5782,6 +5840,12 @@ __extend__(HTMLElement.prototype, {
 		    //Mark for garbage collection
 		    doc = null;
 		},
+        get innerText(){
+            return this.$recursivelyGatherTextFromNodeTree(this);
+        },
+        set innerText(newText){
+            this.innerHTML = newText;  // a paranoid would HTML-escape, but...
+        },
 		get lang() { 
 		    return this.getAttribute("lang"); 
 		    
@@ -6956,7 +7020,7 @@ __extend__(HTMLInputElement.prototype, {
     blur:function(){
         __blur__(this);
 
-        if (this._oldValue != this.getAttribute('value')){
+        if (this._oldValue != this.value){
             var event = document.createEvent();
             event.initEvent("change");
             this.dispatchEvent( event );
@@ -6964,7 +7028,7 @@ __extend__(HTMLInputElement.prototype, {
     },
     focus:function(){
         __focus__(this);
-        this._oldValue = this.getAttribute('value');
+        this._oldValue = this.value;
     },
 	select:function(){
 	    __select__(this);
@@ -7919,6 +7983,8 @@ $w.HTMLTableCellElement	= HTMLTableCellElement;$debug("Defining HTMLTextAreaElem
 var HTMLTextAreaElement = function(ownerDocument) {
     this.HTMLElement = HTMLElement;
     this.HTMLElement(ownerDocument);
+
+    this._oldValue = null;
 };
 HTMLTextAreaElement.prototype = new HTMLElement;
 __extend__(HTMLTextAreaElement.prototype, {
@@ -8007,7 +8073,7 @@ __extend__(HTMLTextAreaElement.prototype, {
     blur:function(){
         __blur__(this);
 
-        if (this._oldValue != this.getAttribute('value')){
+        if (this._oldValue != this.value){
             var event = document.createEvent();
             event.initEvent("change");
             this.dispatchEvent( event );
@@ -8015,7 +8081,7 @@ __extend__(HTMLTextAreaElement.prototype, {
     },
     focus:function(){
         __focus__(this);
-        this._oldValue = this.getAttribute('value');
+        this._oldValue = this.value;
     },
     select:function(){
         __select__(this);
@@ -8041,21 +8107,8 @@ var HTMLTitleElement = function(ownerDocument) {
 };
 HTMLTitleElement.prototype = new HTMLElement;
 __extend__(HTMLTitleElement.prototype, {
-    $recursivelyGatherTextFromNodeTree: function(aNode) {
-        var accumulateText = "";
-        var idx; var n;
-        for (idx=0;idx < aNode.childNodes.length;idx++){
-            n = aNode.childNodes.item(idx);
-	    if      (n.nodeType == DOMNode.TEXT_NODE)
-                accumulateText += n.data;
-            else
-                accumulateText += this.$recursivelyGatherTextFromNodeTree(n);
-        }
-
-        return accumulateText;
-    },
     get text() {
-        return this.$recursivelyGatherTextFromNodeTree(this);
+        return this.innerText;
     },
 
     set text(titleStr) {
@@ -8311,7 +8364,7 @@ var Event = function(options){
       $cancelable = options.cancelable?options.cancelable:true,
       $currentTarget = options.currentTarget?options.currentTarget:null,
       $eventPhase = options.eventPhase?options.eventPhase:Event.CAPTURING_PHASE,
-      $target = options.eventPhase?options.eventPhase:document,
+      $target = options.target?options.target:document,
       $timestamp = options.timestamp?options.timestamp:new Date().getTime().toString(),
       $type = options.type?options.type:"";
   return __extend__(this,{
@@ -8963,7 +9016,7 @@ window.clearInterval = window.clearTimeout = function(num){
 */
 // Window Events
 $debug("Initializing Window Event.");
-var $events = [],
+var $events = [{}],
     $onerror,
     $onload,
     $onunload;
@@ -9071,6 +9124,7 @@ $debug("Initializing Window XMLHttpRequest.");
 $w.XMLHttpRequest = function(){
 	this.headers = {};
 	this.responseHeaders = {};
+    this.$continueProcessing = true;
 	$debug("creating xhr");
 };
 
@@ -9091,36 +9145,41 @@ XMLHttpRequest.prototype = {
 		var _this = this;
 		
 		function makeRequest(){
-			$env.connection(_this, function(){
-			  var responseXML = null;
-				_this.__defineGetter__("responseXML", function(){
-      				if ( _this.responseText.match(/^\s*</) ) {
-      				  if(responseXML){
-      				      return responseXML;
-      				      
-  				      }else{
-        					try {
-        					    $debug("parsing response text into xml document");
-        						responseXML = $domparser.parseFromString(_this.responseText+"");
-                                return responseXML;
-        					} catch(e) { 
-                                $error('response XML does not apear to be well formed xml', e);
-        						responseXML = $domparser.parseFromString("<html>"+
-                                    "<head/><body><p> parse error </p></body></html>");
-                                return responseXML;
+            $env.connection(_this, function(){
+                if (_this.$continueProcessing){
+                    var responseXML = null;
+                    _this.__defineGetter__("responseXML", function(){
+                        if ( _this.responseText.match(/^\s*</) ) {
+                          if(responseXML){
+                              return responseXML;
+
+                          }else{
+                                try {
+                                    $debug("parsing response text into xml document");
+                                    responseXML = $domparser.parseFromString(_this.responseText+"");
+                                    return responseXML;
+                                } catch(e) {
+                                    $error('response XML does not apear to be well formed xml', e);
+                                    responseXML = $domparser.parseFromString("<html>"+
+                                        "<head/><body><p> parse error </p></body></html>");
+                                    return responseXML;
+                                }
                             }
-      					}
-      				}else{
-                        $env.warn('response XML does not apear to be xml');
-                        return null;
-                    }
-      			});
-                _this.__defineSetter__("responseXML",function(xml){
-                    responseXML = xml;
-                });
+                        }else{
+                            $env.warn('response XML does not apear to be xml');
+                            return null;
+                        }
+                    });
+                    _this.__defineSetter__("responseXML",function(xml){
+                        responseXML = xml;
+                    });
+                }
 			}, data);
-			_this.onreadystatechange();
+
+            if (_this.$continueProcessing)
+                _this.onreadystatechange();
 		}
+
 		if (this.async){
 		    $debug("XHR sending asynch;");
 			$env.runAsync(makeRequest);
@@ -9130,7 +9189,7 @@ XMLHttpRequest.prototype = {
 		}
 	},
 	abort: function(){
-		//TODO
+        this.$continueProcessing = false;
 	},
 	onreadystatechange: function(){
 		//TODO

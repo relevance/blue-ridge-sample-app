@@ -1,3 +1,4 @@
+require "rubygems"
 require "micronaut"
 
 def not_in_editor?
